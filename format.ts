@@ -11,7 +11,11 @@ const HEADER_SIZE = TIMESTAMP_SIZE + KEY_SIZE + VALUE_SIZE
 // function decodeKv(data: Buffer): [number, string, string] {
 // }
 
-export function encodeHeader(timestamp: number, keySize: number, valueSize: number): Buffer {
+export function encodeHeader(
+  timestamp: number,
+  keySize: number,
+  valueSize: number
+): Buffer {
   const buffer = Buffer.allocUnsafe(HEADER_SIZE)
 
   buffer.writeUInt32LE(timestamp)
@@ -20,6 +24,7 @@ export function encodeHeader(timestamp: number, keySize: number, valueSize: numb
 
   return buffer
 }
+
 export function decodeHeader(buffer: Buffer): [number, number, number] {
   const timestamp = buffer.subarray(0, TIMESTAMP_SIZE).readUInt32LE()
   const keySize = buffer.readUInt32LE(TIMESTAMP_SIZE)

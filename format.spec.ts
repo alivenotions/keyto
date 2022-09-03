@@ -8,7 +8,6 @@ describe('format', () => {
       // this is 2099
       [4092163200, 1, 1234],
     ])('should encode correctly', (timestampInSecs, keySize, valueSize) => {
-
       const data = encodeHeader(timestampInSecs, keySize, valueSize)
       const header = decodeHeader(data)
       expect(header).toEqual([timestampInSecs, keySize, valueSize])
@@ -18,10 +17,13 @@ describe('format', () => {
       [2 ** 32, 1, 1],
       [1, 2 ** 32, 1],
       [1, 1, 2 ** 32],
-    ])('should throw if the size is > 4 bytes', (timestampInSecs, keySize, valueSize) => {
-      expect(() => {
-        encodeHeader(timestampInSecs, keySize, valueSize)
-      }).toThrow()
-    })
+    ])(
+      'should throw if the size is > 4 bytes',
+      (timestampInSecs, keySize, valueSize) => {
+        expect(() => {
+          encodeHeader(timestampInSecs, keySize, valueSize)
+        }).toThrow()
+      }
+    )
   })
 })

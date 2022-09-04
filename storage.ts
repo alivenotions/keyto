@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import { existsSync, fsyncSync } from 'node:fs'
 import { Buffer } from 'node:buffer'
-import { decodeKv } from './format'
+import { decodeKv, encodeKv } from './format'
 
 type KeyValueRecord = {
   timestamp: number
@@ -47,7 +47,24 @@ export class DiskStorage {
     console.log(buffer)
   }
 
-  public get(key: string) {
+  public async set(key: string, value: string) {
+    const timestampInSecs = Math.floor(Date.now() / 1000)
+    const [size, data] = encodeKv(timestampInSecs, key, value)
+    if (!this.file) {
+      throw new Error('File not found')
+    }
+    const buffer = Buffer.from(data)
+    await this.write(buffer)
+    this.store.set(key, {
+      timestamp: timestampInSecs,
+      position: this.writePosition,
+      size,
+    })
+
+    this.writePosition += size
+  }
+
+  public async get(key: string) {
     const record = this.store.get(key)
 
     if (!this.file) {
@@ -58,17 +75,17 @@ export class DiskStorage {
     }
 
     const buffer = Buffer.allocUnsafe(record.size)
-    this.file.read(buffer, null, record.size, record.position)
+    await this.file.read(buffer, null, record.size, record.position)
     const [timestamp, _key, value] = decodeKv(buffer)
 
     return { timestamp, key, value }
   }
 
-  private write(data: Buffer) {
+  private async write(data: Buffer) {
     if (!this.file) {
       throw new Error('File not found')
     }
-    this.file.write(data)
+    await this.file.write(data)
     fsyncSync(this.file.fd)
   }
 

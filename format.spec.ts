@@ -1,4 +1,4 @@
-import { encodeHeader, decodeHeader } from './format'
+import { encodeHeader, decodeHeader, encodeKv, decodeKv } from './format'
 
 describe('format', () => {
   describe('headers', () => {
@@ -25,5 +25,18 @@ describe('format', () => {
         }).toThrow()
       }
     )
+  })
+
+  describe('key value', () => {
+    it.each([
+      [1662249600, 'hello', 'world'],
+      [1567555200, 'name', 'veryveryveryvery long name'],
+      [4092163200, 'quality', 'likes to play all day long and all day night'],
+      [0, '', ''],
+    ])('should encode key values correctly', (timestampInSecs, key, value) => {
+      const buffer = encodeKv(timestampInSecs, key, value)
+      const data = decodeKv(buffer)
+      expect(data).toEqual([timestampInSecs, key, value])
+    })
   })
 })

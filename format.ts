@@ -5,11 +5,28 @@ const KEY_SIZE = 4
 const VALUE_SIZE = 4
 const HEADER_SIZE = TIMESTAMP_SIZE + KEY_SIZE + VALUE_SIZE
 
-// function encodeKv(timestamp: number, key: string, value: string): [number, Buffer] {
-// }
-//
-// function decodeKv(data: Buffer): [number, string, string] {
-// }
+export function encodeKv(
+  timestamp: number,
+  key: string,
+  value: string
+): Buffer {
+  const header = encodeHeader(timestamp, key.length, value.length)
+  const data = Buffer.concat([header, Buffer.from(key), Buffer.from(value)])
+  return data
+}
+
+export function decodeKv(buffer: Buffer): [number, string, string] {
+  const [timestamp, keySize, _valueSize] = decodeHeader(
+    buffer.subarray(0, HEADER_SIZE)
+  )
+  const keyBytes = buffer.subarray(HEADER_SIZE, HEADER_SIZE + keySize)
+  const valueBytes = buffer.subarray(HEADER_SIZE + keySize)
+
+  const key = keyBytes.toString('utf8')
+  const value = valueBytes.toString('utf8')
+
+  return [timestamp, key, value]
+}
 
 export function encodeHeader(
   timestamp: number,

@@ -25,6 +25,7 @@ export class DiskStorage {
     const diskStorage = new DiskStorage(fileName, file)
 
     if (existsSync(fileName)) {
+      console.log('file already exists')
       await diskStorage.initializeStore()
     }
     diskStorage.file = await fs.open(fileName, 'a+')
@@ -43,8 +44,7 @@ export class DiskStorage {
     }
 
     const buffer = await fs.readFile(file)
-    console.log('reading buffer')
-    console.log(buffer)
+    await file.close()
   }
 
   public async set(key: string, value: string) {

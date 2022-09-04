@@ -9,10 +9,10 @@ export function encodeKv(
   timestamp: number,
   key: string,
   value: string
-): Buffer {
+): [number, Buffer] {
   const header = encodeHeader(timestamp, key.length, value.length)
   const data = Buffer.concat([header, Buffer.from(key), Buffer.from(value)])
-  return data
+  return [data.length, data]
 }
 
 export function decodeKv(buffer: Buffer): [number, string, string] {

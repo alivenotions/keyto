@@ -34,7 +34,7 @@ describe('format', () => {
       [4092163200, 'quality', 'likes to play all day long and all day night'],
       [0, '', ''],
     ])('should encode key values correctly', (timestampInSecs, key, value) => {
-      const buffer = encodeKv(timestampInSecs, key, value)
+      const [_size, buffer] = encodeKv(timestampInSecs, key, value)
       const data = decodeKv(buffer)
       expect(data).toEqual([timestampInSecs, key, value])
     })

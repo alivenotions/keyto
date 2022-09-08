@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer'
 const TIMESTAMP_SIZE = 4
 const KEY_SIZE = 4
 const VALUE_SIZE = 4
-const HEADER_SIZE = TIMESTAMP_SIZE + KEY_SIZE + VALUE_SIZE
+export const HEADER_SIZE = TIMESTAMP_SIZE + KEY_SIZE + VALUE_SIZE
 
 export function encodeKv(
   timestamp: number,

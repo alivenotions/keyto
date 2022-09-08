@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import { existsSync, fsyncSync } from 'node:fs'
 import { Buffer } from 'node:buffer'
-import { decodeKv, encodeKv } from './format'
+import { decodeKv, encodeKv, decodeHeader, HEADER_SIZE } from './format'
 
 type KeyValueRecord = {
   timestamp: number
@@ -43,7 +43,26 @@ export class DiskStorage {
       throw new Error('File not found error')
     }
 
+    console.log('initializing store')
+    console.log('this will take a long time if the db is large')
     const buffer = await fs.readFile(file)
+
+    let offset = 0
+    while (offset < buffer.length) {
+      const [timestamp, keySize, valueSize] = decodeHeader(
+        buffer.subarray(offset, offset + HEADER_SIZE)
+      )
+      const size = HEADER_SIZE + keySize + valueSize
+      const [_timestamp, key, _value] = decodeKv(
+        buffer.subarray(offset, offset + size)
+      )
+      console.log(`read: ${key}`)
+      this.store.set(key, { timestamp, position: offset, size })
+      offset += size
+    }
+    console.log('finished initializing the store')
+    this.writePosition += offset
+
     await file.close()
   }
 
